@@ -1,13 +1,13 @@
-package com.github.caryyu.excel2pdf;
+package com.github.caryyu.excel2pdf.uitil;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
-
-import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.format.*;
+import org.apache.poi.ss.format.CellNumberFormatter;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 
@@ -17,7 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by cary on 6/15/17.
+ * @Author laixiaoxing
+ * @Description excel里面的值和样式转为pdf里面表格
+ * @Date 下午11:48 2019/2/18
  */
 public class PdfTableExcel {
 	// ExcelObject
@@ -98,7 +100,7 @@ public class PdfTableExcel {
 
 				int[] rgb = getBackgroundColor(cell.getCellStyle());
 				pdfpCell.setBackgroundColor(new BaseColor(rgb[0],rgb[1],rgb[2]));
-//				pdfpCell.setBackgroundColor(new BaseColor(getBackgroundColorByExcel(cell.getCellStyle())));
+				//pdfpCell.setBackgroundColor(new BaseColor(getBackgroundColorByExcel(cell.getCellStyle())));
 				pdfpCell.setColspan(colspan);
 				pdfpCell.setRowspan(rowspan);
 				pdfpCell.setVerticalAlignment(getVAlignByExcel(cell.getCellStyle().getVerticalAlignment()));
@@ -106,8 +108,9 @@ public class PdfTableExcel {
 				pdfpCell.setPhrase(getPhrase(cell));
 				// pdfpCell.setFixedHeight(this.getPixelHeight(row.getHeightInPoints()));
 				pdfpCell.setMinimumHeight(this.getPixelHeight(row.getHeightInPoints()));
-				// 不自動換行,應該參數化
-				pdfpCell.setNoWrap(true);
+				// todo 不自動換行,應該參數化
+				//pdfpCell.setNoWrap(true);
+				pdfpCell.setNoWrap(false);
 				// 中文字才不會黏在邊界線上
 				pdfpCell.setPaddingBottom(3);
 
@@ -275,16 +278,18 @@ public class PdfTableExcel {
 		// 轉換 POI Font 到 iText Font
 		Font itextFont = Resource.getFont((HSSFFont) font);
 		Font result = itextFont;
-		// 粗體+斜體
-		if (font.getBoldweight() == org.apache.poi.ss.usermodel.Font.BOLDWEIGHT_BOLD
-				&& font.getItalic()) {
-			result.setStyle(Font.BOLDITALIC);
-		}else if (font.getBoldweight() == org.apache.poi.ss.usermodel.Font.BOLDWEIGHT_BOLD) { // 粗體
-			result.setStyle(Font.BOLD);
-		}else if (font.getItalic()) { // 斜體
-			result.setStyle(Font.ITALIC);
-		}
-		
+//		// 粗體+斜體
+//		result.setStyle(Font.BOLDITALIC);
+//		if (font.getBoldweight() == org.apache.poi.ss.usermodel.Font.BOLDWEIGHT_BOLD
+//				&& font.getItalic()) {
+//
+//		}else if (font.getBoldweight() == org.apache.poi.ss.usermodel.Font.BOLDWEIGHT_BOLD) { // 粗體
+//			result.setStyle(Font.BOLD);
+//		}else if (font.getItalic()) { // 斜體
+//			result.setStyle(Font.ITALIC);
+//		}
+
+		result.setStyle(Font.NORMAL);
 		// 字体颜色
 		int colorIndex = font.getColor();
 		HSSFColor color = HSSFColor.getIndexHash().get(colorIndex);
@@ -348,61 +353,64 @@ public class PdfTableExcel {
 	}
 
 	protected short getBorderWidth(short borderType) {
-		switch (borderType) {
-		case CellStyle.BORDER_DASH_DOT:
-		case CellStyle.BORDER_DASH_DOT_DOT:
-		case CellStyle.BORDER_DASHED:
-		case CellStyle.BORDER_DOTTED:
-		case CellStyle.BORDER_HAIR:
-		case CellStyle.BORDER_DOUBLE:
-		case CellStyle.BORDER_MEDIUM:
-		case CellStyle.BORDER_MEDIUM_DASH_DOT:
-		case CellStyle.BORDER_MEDIUM_DASH_DOT_DOT:
-		case CellStyle.BORDER_MEDIUM_DASHED:
-		case CellStyle.BORDER_SLANTED_DASH_DOT:
-			return 1;
-		case CellStyle.BORDER_NONE:
-			return 0;
-		case CellStyle.BORDER_THIN:
-			return 1;
-		case CellStyle.BORDER_THICK:
-			return 2;
-		default:
-			return 1;
-		}
+//		switch (borderType) {
+//		case CellStyle.BORDER_DASH_DOT:
+//		case CellStyle.BORDER_DASH_DOT_DOT:
+//		case CellStyle.BORDER_DASHED:
+//		case CellStyle.BORDER_DOTTED:
+//		case CellStyle.BORDER_HAIR:
+//		case CellStyle.BORDER_DOUBLE:
+//		case CellStyle.BORDER_MEDIUM:
+//		case CellStyle.BORDER_MEDIUM_DASH_DOT:
+//		case CellStyle.BORDER_MEDIUM_DASH_DOT_DOT:
+//		case CellStyle.BORDER_MEDIUM_DASHED:
+//		case CellStyle.BORDER_SLANTED_DASH_DOT:
+//			return 1;
+//		case CellStyle.BORDER_NONE:
+//			return 0;
+//		case CellStyle.BORDER_THIN:
+//			return 1;
+//		case CellStyle.BORDER_THICK:
+//			return 2;
+//		default:
+//			return 1;
+//		}
+		return 1;
 	}
 
 	protected int getVAlignByExcel(short align) {
-		int result = 0;
-		if (align == CellStyle.VERTICAL_BOTTOM) {
-			result = Element.ALIGN_BOTTOM;
-		}
-		if (align == CellStyle.VERTICAL_CENTER) {
-			result = Element.ALIGN_MIDDLE;
-		}
-		if (align == CellStyle.VERTICAL_JUSTIFY) {
-			result = Element.ALIGN_JUSTIFIED;
-		}
-		if (align == CellStyle.VERTICAL_TOP) {
-			result = Element.ALIGN_TOP;
-		}
-		return result;
+//		int result = 0;
+//		if (align == CellStyle.VERTICAL_BOTTOM) {
+//			result = Element.ALIGN_BOTTOM;
+//		}
+//		if (align == CellStyle.VERTICAL_CENTER) {
+//			result = Element.ALIGN_MIDDLE;
+//		}
+//		if (align == CellStyle.VERTICAL_JUSTIFY) {
+//			result = Element.ALIGN_JUSTIFIED;
+//		}
+//		if (align == CellStyle.VERTICAL_TOP) {
+//			result = Element.ALIGN_TOP;
+//		}
+//		return result;
+		return Element.ALIGN_MIDDLE;
 	}
 
 	protected int getHAlignByExcel(short align) {
-		int result = 0;
-		if (align == CellStyle.ALIGN_LEFT) {
-			result = Element.ALIGN_LEFT;
-		}
-		if (align == CellStyle.ALIGN_RIGHT) {
-			result = Element.ALIGN_RIGHT;
-		}
-		if (align == CellStyle.ALIGN_JUSTIFY) {
-			result = Element.ALIGN_JUSTIFIED;
-		}
-		if (align == CellStyle.ALIGN_CENTER) {
-			result = Element.ALIGN_CENTER;
-		}
-		return result;
+//		int result = 0;
+//		if (align == CellStyle.ALIGN_LEFT) {
+//			result = Element.ALIGN_LEFT;
+//		}
+//		if (align == CellStyle.ALIGN_RIGHT) {
+//			result = Element.ALIGN_RIGHT;
+//		}
+//		if (align == CellStyle.ALIGN_JUSTIFY) {
+//			result = Element.ALIGN_JUSTIFIED;
+//		}
+//		if (align == CellStyle.ALIGN_CENTER) {
+//			result = Element.ALIGN_CENTER;
+//		}
+//		return result;
+		return Element.ALIGN_CENTER;
 	}
 }

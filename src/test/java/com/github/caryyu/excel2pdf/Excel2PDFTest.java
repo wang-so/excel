@@ -1,82 +1,44 @@
 package com.github.caryyu.excel2pdf;
-
-import com.itextpdf.text.DocumentException;
-
 import java.io.*;
 import java.util.*;
 
+import com.github.caryyu.excel2pdf.excelModel.LandTaxDeclarationVO;
+import com.itextpdf.text.RectangleReadOnly;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.*;
 
 public class Excel2PDFTest {
-	String resourcesDir = "src/test/resources";
-	String outputDir = "target/output";
+    static String resourcesDir = "src/test/resources";
+    static String outputDir = "target/output";
 
-	@Before
-	public void setUp() throws Exception {
-		File output = new File(outputDir);
-		output.mkdir();
-	}
+    @Before
+    public void setUp() throws Exception {
+        File output = new File(outputDir);
+        output.mkdir();
+    }
 
-	Map<String, File> getExcelFiles() {
-		Map<String, File> excelFiles = new LinkedHashMap<String, File>();
-		File dir = new File(resourcesDir);
-		if (dir.isDirectory()) {
-			File[] files = dir.listFiles(new FilenameFilter() {
-				public boolean accept(File dir, String name) {
-					return name.toLowerCase().endsWith("xls");
-				}
-			});
-			for (int i = 0; i < files.length; i++) {
-				String idx = (i + 1) + ".";
-				excelFiles.put(idx + files[i].getName(), files[i]);
-			}
-		}
-		return excelFiles;
-	}
 
-	@Test
-	public void testCombineAll() throws IOException, DocumentException {
-		List<ExcelObject> objects = new ArrayList<ExcelObject>();
-		Map<String, File> excelFiles = getExcelFiles();
-		for (String index : excelFiles.keySet()) {
-			File excelFile = excelFiles.get(index);
-			FileInputStream fis = new FileInputStream(excelFile);
-			objects.add(new ExcelObject(index, fis));
-		}
+    public static void main(String[] args) throws Exception {
+        //定义要写入到excel模版上的值
+        LandTaxDeclarationVO landTaxDeclarationVO =new LandTaxDeclarationVO();
+        landTaxDeclarationVO.setTaxpayerID("test12345");
+        landTaxDeclarationVO.setTaxPeriod("2018-10-10");
 
-		FileOutputStream fos = new FileOutputStream(new File(outputDir+"/allInOne.pdf"));
-		Excel2Pdf pdf = new Excel2Pdf(objects, fos);
+        //如果要在一个pdf上展示多个sheet页面
+        Map<Object, String> voAndSheetName2 = new HashMap<>();
+        voAndSheetName2.put(landTaxDeclarationVO, "Sheet1");
 
-		pdf.convert();
-	}
+        String templateUrl2 = resourcesDir+"/"+"dishuitest.xls";
 
-	public static void main(String[] args) throws Exception {
-		Excel2PDFTest test = new Excel2PDFTest();
-		test.testSingle();
-	}
-
-	@Test
-	public void testSingle() throws IOException, DocumentException {
-		Map<String, File> excelFiles = getExcelFiles();
-		for (String index : excelFiles.keySet()) {
-			File excelFile = excelFiles.get(index);
-			List<ExcelObject> objects = new ArrayList<ExcelObject>();
-			FileInputStream fis = new FileInputStream(excelFile);
-			FileOutputStream fos = null;
-			try {
-				objects.add(new ExcelObject(index, fis));
-				String excel = excelFile.getName();
-				File output = new File(outputDir+"/" + excel.substring(0, excel.lastIndexOf(".")) + ".pdf");
-				output.getParentFile().mkdirs();
-				fos = new FileOutputStream(output);
-				Excel2Pdf pdf = new Excel2Pdf(objects, fos);
-				pdf.convert();
-			}finally {
-				if(fis != null)
-					fis.close();
-				if(fos != null)
-					fos.close();
-			}
-		}
-	}
+        //将模版和要写入模版的值传入，转换成workbook
+        Workbook workbook = ExcelConvertPDF.outPutWorkbookByModel(voAndSheetName2, templateUrl2);
+        List<Workbook> workbooks = new ArrayList<>();
+        workbooks.add(workbook);
+        //设置导出的页面的大小
+        RectangleReadOnly pageSize = new RectangleReadOnly(1000.0F, 850.0F);
+        //定义输出流 也可以支持web的httpRespone
+        String pathOfPdf = resourcesDir +"/"+ "test1.pdf";
+        FileOutputStream fos = new FileOutputStream(pathOfPdf);
+        ExcelConvertPDF.ExcelConvertPDF(workbooks, fos, pageSize);
+    }
 }

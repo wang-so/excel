@@ -1,4 +1,4 @@
-package com.github.caryyu.excel2pdf;
+package com.github.caryyu.excel2pdf.uitil;
 
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFPicture;
@@ -9,11 +9,13 @@ import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.PictureData;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.List;
 
 /**
- * Created by cary on 6/15/17.
+ * @Author laixiaoxing
+ * @Description 设置图片
+ * @Date 下午11:49 2019/2/18
  */
 public class POIImage {
     protected Dimension dimension;

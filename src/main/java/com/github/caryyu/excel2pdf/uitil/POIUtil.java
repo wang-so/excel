@@ -1,10 +1,10 @@
-package com.github.caryyu.excel2pdf;
+package com.github.caryyu.excel2pdf.uitil;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Color;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.ss.usermodel.Color;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.imageio.ImageIO;
@@ -18,7 +18,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * Created by cary on 6/15/17.
+ * @Author laixiaoxing
+ * @Description 设置单元格颜色
+ * @Date 下午11:52 2019/2/18
  */
 public class POIUtil {
 	public static int[] getColorRGB(Color color){
@@ -34,7 +36,7 @@ public class POIUtil {
             blue = rgb[2];
         }else  if (color instanceof XSSFColor) {
             XSSFColor xssfColor = (XSSFColor) color;
-            byte[] rgb = xssfColor.getRgb();
+            byte[] rgb = xssfColor.getRGB();
             if(rgb != null) {
                 red = (rgb[0] < 0) ? (rgb[0] + 256) : rgb[0];
                 green = (rgb[1] < 0) ? (rgb[1] + 256) : rgb[1];
@@ -50,30 +52,34 @@ public class POIUtil {
     public static int getRGB(Color color){
         int result = 0x00FFFFFF;
 
-        int red = 0;
-        int green = 0;
-        int blue = 0;
+//        int red = 0;
+//        int green = 0;
+//        int blue = 0;
+//
+//        if (color instanceof HSSFColor) {
+//            HSSFColor hssfColor = (HSSFColor) color;
+//            short[] rgb = hssfColor.getTriplet();
+//            red = rgb[0];
+//            green = rgb[1];
+//            blue = rgb[2];
+//        }else  if (color instanceof XSSFColor) {
+//            XSSFColor xssfColor = (XSSFColor) color;
+//            byte[] rgb = xssfColor.getRgb();
+//            if(rgb != null) {
+//                red = (rgb[0] < 0) ? (rgb[0] + 256) : rgb[0];
+//                green = (rgb[1] < 0) ? (rgb[1] + 256) : rgb[1];
+//                blue = (rgb[2] < 0) ? (rgb[2] + 256) : rgb[2];
+//            }
+//        }
+//
+//        if(red != 0 || green != 0 || blue != 0){
+//            result = new java.awt.Color(red, green, blue).getRGB();
+//        } todo 颜色有问题
 
-        if (color instanceof HSSFColor) {
-            HSSFColor hssfColor = (HSSFColor) color;
-            short[] rgb = hssfColor.getTriplet();
-            red = rgb[0];
-            green = rgb[1];
-            blue = rgb[2];
-        }else  if (color instanceof XSSFColor) {
-            XSSFColor xssfColor = (XSSFColor) color;
-            byte[] rgb = xssfColor.getRgb();
-            if(rgb != null) {
-                red = (rgb[0] < 0) ? (rgb[0] + 256) : rgb[0];
-                green = (rgb[1] < 0) ? (rgb[1] + 256) : rgb[1];
-                blue = (rgb[2] < 0) ? (rgb[2] + 256) : rgb[2];
-            }
-        }
-
-        if(red != 0 || green != 0 || blue != 0){
-            result = new java.awt.Color(red, green, blue).getRGB();
-        }
+        result = new java.awt.Color(0, 0, 0).getRGB();
         return result;
+
+
     }
 
     public static int getBorderRBG(Workbook wb  , short index){
